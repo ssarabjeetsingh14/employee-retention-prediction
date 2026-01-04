@@ -1,219 +1,143 @@
 import streamlit as st
 import pandas as pd
 import pickle
-import matplotlib.pyplot as plt
 
-# =========================================================
-# Page Configuration
-# =========================================================
+# =====================================================
+# Page Configuration (MUST BE FIRST)
+# =====================================================
 st.set_page_config(
     page_title="Employee Retention Prediction",
     layout="wide"
 )
 
-# =========================================================
-# Custom CSS – Dark Blue Corporate Theme
-# =========================================================
+# =====================================================
+# Custom Theme CSS (DEPLOYMENT SAFE)
+# =====================================================
 st.markdown("""
 <style>
-/* ===== Sidebar Labels ===== */
-section[data-testid="stSidebar"] label {
+/* ===== Global ===== */
+html, body, .main {
+    background-color: #0B0B0B;
+    color: #FFFFFF;
+}
+
+/* ===== Remove Streamlit Branding ===== */
+header {visibility: hidden;}
+footer {visibility: hidden;}
+
+/* ===== Header Banner ===== */
+.custom-header {
+    background: linear-gradient(90deg, #2F4FDB, #3B6FEA, #2F86FF);
+    padding: 22px 30px;
+    border-radius: 18px;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 25px rgba(47, 79, 219, 0.45);
+}
+
+/* ===== Sidebar ===== */
+section[data-testid="stSidebar"] {
+    background-color: #0F0F0F;
+}
+
+/* ===== Sidebar Labels (FIXED VISIBILITY) ===== */
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] div {
     color: #F9FAFB !important;
     font-weight: 600;
 }
 
-/* ===== Sidebar Text ===== */
-section[data-testid="stSidebar"] span,
-section[data-testid="stSidebar"] div {
-    color: #E5E7EB !important;
+/* ===== Inputs ===== */
+input, textarea, select {
+    background-color: #141414 !important;
+    color: #FFFFFF !important;
+    border-radius: 8px;
+    border: 1px solid #2A2A2A;
 }
 
-/* ===== Radio / Checkbox Text ===== */
-section[data-testid="stSidebar"] .stRadio label,
-section[data-testid="stSidebar"] .stCheckbox label {
-    color: #F9FAFB !important;
+/* ===== Buttons ===== */
+.stButton > button {
+    background: linear-gradient(90deg, #2F4FDB, #2F86FF);
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 0.6rem 1.4rem;
+    border: none;
+}
+.stButton > button:hover {
+    background: linear-gradient(90deg, #2B45C7, #256FE0);
 }
 
-/* ===== Selectbox Label ===== */
-section[data-testid="stSidebar"] .stSelectbox label {
-    color: #F9FAFB !important;
-}
-
-/* ===== Input Placeholders ===== */
-::placeholder {
-    color: #9CA3AF !important;
+/* ===== Result Card ===== */
+.result-card {
+    background-color: #101010;
+    padding: 25px;
+    border-radius: 14px;
+    border-left: 6px solid #2F86FF;
+    font-size: 22px;
 }
 </style>
 """, unsafe_allow_html=True)
 
+# =====================================================
+# Header
+# =====================================================
+st.markdown(
+    '<div class="custom-header">Capstone Project | Employee Retention Prediction</div>',
+    unsafe_allow_html=True
+)
 
-
-# =========================================================
-# Load Model & Feature Columns (CACHED)
-# =========================================================
+# =====================================================
+# Load Deployed Model (DO NOT MODIFY)
+# =====================================================
 @st.cache_resource
 def load_model():
-    with open("lgb_model.pkl", "rb") as f:
-        model = pickle.load(f)
+    with open("pipeline.pkl", "rb") as f:
+        return pickle.load(f)
 
-    with open("feature_columns.pkl", "rb") as f:
-        feature_columns = pickle.load(f)
+model = load_model()
 
-    return model, feature_columns
+# =====================================================
+# Sidebar Inputs (UI ONLY – SAFE)
+# =====================================================
+st.sidebar.header("Employee Details")
 
-
-model, feature_columns = load_model()
-
-# =========================================================
-# Sidebar – Employee Inputs
-# =========================================================
-st.sidebar.header("Employee Profile")
-
-gender = st.sidebar.selectbox("Gender", ["Male", "Female", "Other"])
-
-city = st.sidebar.text_input(
-    "City Code (example: city_103)",
-    help="Use the same city format as the training dataset"
+experience = st.sidebar.slider("Experience (Years)", 0, 30, 5)
+salary = st.sidebar.number_input("Monthly Salary", min_value=1000, value=30000)
+training_hours = st.sidebar.slider("Training Hours", 0, 100, 20)
+work_life_balance = st.sidebar.selectbox(
+    "Work Life Balance",
+    ["Low", "Medium", "High"]
 )
 
-relevent_experience = st.sidebar.selectbox(
-    "Relevant Experience",
-    ["Has relevent experience", "No relevent experience"]
-)
+# =====================================================
+# Input Mapping (CRITICAL – DO NOT CHANGE KEYS)
+# =====================================================
+input_data = pd.DataFrame([{
+    "experience": experience,
+    "salary": salary,
+    "training_hours": training_hours,
+    "work_life_balance": work_life_balance
+}])
 
-enrolled_university = st.sidebar.selectbox(
-    "University Enrollment",
-    ["no_enrollment", "Part time course", "Full time course"]
-)
+# =====================================================
+# Prediction
+# =====================================================
+if st.button("Predict Retention"):
+    prediction = model.predict(input_data)[0]
+    probability = model.predict_proba(input_data)[0][1]
 
-education_level = st.sidebar.selectbox(
-    "Education Level",
-    ["Graduate", "Masters", "High School", "Phd"]
-)
+    result = "Employee Will Stay" if prediction == 0 else "Employee Will Leave"
 
-company_type = st.sidebar.selectbox(
-    "Company Type",
-    ["Pvt Ltd", "Funded Startup", "Public Sector", "NGO", "Other"]
-)
-
-city_development_index = st.sidebar.slider(
-    "City Development Index",
-    0.0, 1.0, 0.5, 0.01
-)
-
-experience = st.sidebar.number_input(
-    "Total Experience (Years)",
-    min_value=0,
-    max_value=30,
-    value=5
-)
-
-training_hours = st.sidebar.number_input(
-    "Training Hours Completed",
-    min_value=0,
-    max_value=400,
-    value=120,
-    step=5
-)
-
-lastnewjob = st.sidebar.selectbox(
-    "Years Since Last Job Change",
-    ["Never", "1", "2", "3", "4", ">4"]
-)
-
-# =========================================================
-# Main Section
-# =========================================================
-st.title("Employee Retention Prediction")
-
-st.write(
-    "This application estimates the probability that an employee is likely "
-    "to look for a job change based on historical workforce data."
-)
-
-# =========================================================
-# Prediction Logic
-# =========================================================
-if st.button("Predict Job Change Probability"):
-
-    if city.strip() == "":
-        st.error("City code cannot be empty.")
-        st.stop()
-
-    input_data = {
-        "gender": gender,
-        "city": city,
-        "relevent_experience": relevent_experience,
-        "enrolled_university": enrolled_university,
-        "education_level": education_level,
-        "company_type": company_type,
-        "city_development_index": city_development_index,
-        "experience": experience,
-        "training_hours": training_hours,
-        "lastnewjob": lastnewjob
-    }
-
-    input_df = pd.DataFrame([input_data])
-
-    # One-hot encoding
-    input_df = pd.get_dummies(input_df, drop_first=True)
-
-    # Align with training features
-    for col in feature_columns:
-        if col not in input_df.columns:
-            input_df[col] = 0
-
-    # Remove unexpected columns
-    input_df = input_df[feature_columns]
-
-    # Predict probability
-    probability = model.predict_proba(input_df)[0][1]
-
-    # =====================================================
-    # Result Display
-    # =====================================================
-    st.markdown('<div class="metric-box">', unsafe_allow_html=True)
-
-    st.subheader("Prediction Result")
-    st.metric("Job Change Probability", f"{probability:.2%}")
-
-    if probability < 0.30:
-        st.success("Low risk of job change")
-    elif probability < 0.60:
-        st.warning("Medium risk of job change")
-    else:
-        st.error("High risk of job change")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # =====================================================
-    # Visualization
-    # =====================================================
-    st.subheader("Risk Visualization")
-
-    fig, ax = plt.subplots(figsize=(6, 2))
-    ax.barh(["Job Change Risk"], [probability])
-    ax.set_xlim(0, 1)
-    ax.set_xlabel("Probability")
-    ax.set_title("Predicted Job Change Probability")
-
-    st.pyplot(fig)
-
-# =========================================================
-# Explanation Section
-# =========================================================
-with st.expander("Why probability-based prediction?"):
-    st.info(
-        "Employee retention is a risk-based problem. "
-        "Probability scores allow HR teams to prioritize employees "
-        "for engagement or retention strategies instead of relying "
-        "on a rigid yes/no prediction."
+    st.markdown(
+        f"""
+        <div class="result-card">
+            <b>Prediction:</b> {result}<br><br>
+            <b>Probability of Leaving:</b> {probability:.2%}
+        </div>
+        """,
+        unsafe_allow_html=True
     )
-
-# =========================================================
-# Footer
-# =========================================================
-st.caption(
-    "This tool is intended for decision support only. "
-    "Predictions are based on historical patterns and may not reflect external market conditions."
-)
