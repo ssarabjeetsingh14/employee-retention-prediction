@@ -16,38 +16,32 @@ st.set_page_config(
 # =========================================================
 st.markdown("""
 <style>
-.main {
-    background-color: #0E1117;
-    color: #FFFFFF;
-}
-
-h1, h2, h3 {
-    color: #FFFFFF;
-}
-
-.stSidebar {
-    background-color: #111827;
-}
-
-.stButton>button {
-    background-color: #2C7BE5;
-    color: white;
+/* ===== Sidebar Labels ===== */
+section[data-testid="stSidebar"] label {
+    color: #F9FAFB !important;
     font-weight: 600;
-    border-radius: 8px;
-    padding: 0.6rem 1.2rem;
-    border: none;
 }
 
-.stButton>button:hover {
-    background-color: #1A68D1;
+/* ===== Sidebar Text ===== */
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] div {
+    color: #E5E7EB !important;
 }
 
-.metric-box {
-    background-color: #111827;
-    padding: 18px;
-    border-radius: 12px;
-    border-left: 6px solid #2C7BE5;
-    margin-top: 10px;
+/* ===== Radio / Checkbox Text ===== */
+section[data-testid="stSidebar"] .stRadio label,
+section[data-testid="stSidebar"] .stCheckbox label {
+    color: #F9FAFB !important;
+}
+
+/* ===== Selectbox Label ===== */
+section[data-testid="stSidebar"] .stSelectbox label {
+    color: #F9FAFB !important;
+}
+
+/* ===== Input Placeholders ===== */
+::placeholder {
+    color: #9CA3AF !important;
 }
 </style>
 """, unsafe_allow_html=True)
