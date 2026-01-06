@@ -78,7 +78,7 @@ enrolled_university = st.sidebar.selectbox(
 )
 education_level = st.sidebar.selectbox(
     "Education Level",
-    ["Graduate", "Masters", "High School", "Phd"]
+    ["Graduate", "Masters", "High School", "Phd","Primary School"]
 )
 company_type = st.sidebar.selectbox(
     "Company Type",
