@@ -68,7 +68,6 @@ with open("feature_columns.pkl", "rb") as f:
 st.sidebar.header("Employee Profile")
 
 gender = st.sidebar.selectbox("Gender", ["Male", "Female", "Other"])
-city = st.sidebar.text_input("City Code (e.g. city_103)")
 relevent_experience = st.sidebar.selectbox(
     "Relevant Experience",
     ["Has relevent experience", "No relevent experience"]
@@ -117,7 +116,6 @@ if st.button("Predict Job Change Probability"):
 
     input_data = {
         "gender": gender,
-        "city": city,
         "relevent_experience": relevent_experience,
         "enrolled_university": enrolled_university,
         "education_level": education_level,
