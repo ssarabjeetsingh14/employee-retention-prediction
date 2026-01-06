@@ -82,7 +82,7 @@ education_level = st.sidebar.selectbox(
 )
 company_type = st.sidebar.selectbox(
     "Company Type",
-    ["Pvt Ltd", "Funded Startup", "Public Sector", "NGO", "Other"]
+    ["Early Stage Startup","Pvt Ltd", "Funded Startup", "Public Sector", "NGO", "Other"]
 )
 city_development_index = st.sidebar.slider(
     "City Development Index",
