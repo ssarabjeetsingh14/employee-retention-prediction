@@ -17,19 +17,39 @@ st.set_page_config(
 # =========================================================
 st.markdown("""
 <style>
+/* Main app background */
 .main {
     background-color: #0E1117;
     color: #FFFFFF;
 }
 
+/* Headings */
 h1, h2, h3 {
     color: #FFFFFF;
 }
 
-.stSidebar {
+/* Sidebar background */
+section[data-testid="stSidebar"] {
     background-color: #111827;
 }
 
+/* Sidebar labels (THIS FIXES YOUR ISSUE) */
+section[data-testid="stSidebar"] label {
+    color: #FFFFFF !important;
+    font-weight: 600;
+}
+
+/* Sidebar selected values / text */
+section[data-testid="stSidebar"] span {
+    color: #FFFFFF !important;
+}
+
+/* Sidebar slider numbers */
+section[data-testid="stSidebar"] div[data-baseweb="slider"] {
+    color: #FFFFFF !important;
+}
+
+/* Buttons */
 .stButton>button {
     background-color: #2C7BE5;
     color: white;
@@ -43,6 +63,7 @@ h1, h2, h3 {
     background-color: #1A68D1;
 }
 
+/* Metric cards */
 .metric-box {
     background-color: #111827;
     padding: 18px;
@@ -52,6 +73,7 @@ h1, h2, h3 {
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 # =========================================================
 # Load Model & Feature Columns
