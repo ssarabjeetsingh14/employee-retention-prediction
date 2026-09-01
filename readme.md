@@ -42,5 +42,3 @@ This project predicts **job change probability** using historical employee data 
 
 ---
 
-## 📂 Project Structure
-
